@@ -23,9 +23,12 @@ The OS chosen for all the container is Debian:12.
 There is a *Makefile* at the root of the repository and the rules are:
 | Syntax | Description |
 | --- | --- |
-| make (make all) | starts the services and builds the images if necessary |
+| make (all, setup, up) | sets the necessary directories and permissions starts the services and builds the images if necessary |
+| make up | starts the containers and builds the images if necessary |
 | make build | builds the images |
 | make start | starts the containers if the images were built |
+| make clean | stops and removes the containers |
+| make fclean | stops and removes the containers, volumes and all the images that were already built |
 
 
 
