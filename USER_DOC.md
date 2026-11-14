@@ -17,6 +17,7 @@ to stop the services run:
     make clean
 ```
 you can the site opening the following url in your browser: https://acamargo.42.fr.
+
 if you wish to see the wordpress administration panel: https://acamargo.42.fr/wp-admin or to see Adminer open https://acamargo.42.fr/adminer.php
 
 The credentials are store in the .env file in the srcs/ directory
