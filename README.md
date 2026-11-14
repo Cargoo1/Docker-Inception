@@ -39,10 +39,10 @@ Some of the resources used in this project are listed below:
 - [Docker Reference](https://docs.docker.com/reference/)
 - [NGINX tls server](https://nginx.org/en/docs/http/configuring_https_servers.html)
 - [MariaDB how to create a database and a user](https://docs.bitnami.com/virtual-machine/infrastructure/lamp/configuration/create-database-mariadb/)
-- [Setting up WordPress and Nginx] (https://www.youtube.com/watch?v=BN8lMesmvPw)
-- [Adminer] (https://blog.crea-troyes.fr/4554/adminer-tutoriel-comment-le-maitriser/)
-- [Vsftpd] (https://www.youtube.com/watch?v=t50UfbGvWhw&t=118s)
-- [Redis] (https://dev.to/rijultp/understanding-redisconf-how-to-configure-your-redis-server-38lf)
+- [Setting up WordPress and Nginx](https://www.youtube.com/watch?v=BN8lMesmvPw)
+- [Adminer](https://blog.crea-troyes.fr/4554/adminer-tutoriel-comment-le-maitriser/)
+- [Vsftpd](https://www.youtube.com/watch?v=t50UfbGvWhw&t=118s)
+- [Redis](https://dev.to/rijultp/understanding-redisconf-how-to-configure-your-redis-server-38lf)
 
 ## Project description
 
@@ -57,4 +57,10 @@ If instead you need to use a password, or a username in the container, you can u
 
 ### Docker network vs Host network
 
+You can open ports in docker network so the host can connect to that port, they dont share the ports and the network, theres a *host* mode but its more insecure because it shares all the ports of the host to the container.
+Also you can manually make bridge networks between containers so they can comunicate with each other
 
+### Docker volumes vs Bind mounts
+
+We can use docker volumes to share data with the host and the containers, since everything is lost from a container when its removed, we can have persisten data with volumes so the host saves that data.
+A bind mount directly mounts a file or a folder of the host into the container and any change is reflected in both sides, but is up to the host to manage the permissions its faster and to see changes theres no need to rebuild the container, volumes are a better solution to store data because is managed by Docker 
