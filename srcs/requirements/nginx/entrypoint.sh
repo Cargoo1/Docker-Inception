@@ -25,7 +25,7 @@ then
 	hugo 1>/dev/null
 fi
 
-chown -R www-data:www-data /var/www/$DOMAIN_NAME
+chown -R www-data:www-data /var/www/
 chmod -R 775 /var/www/$DOMAIN_NAME
 
 exec nginx -g "daemon off;"

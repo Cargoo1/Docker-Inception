@@ -128,10 +128,10 @@ services:
     container_name: nginx
     healthcheck:
       test: ["CMD", "curl", "--silent", "-k" , "https://localhost/"]
-      interval: 2s
+      interval: 3s
       retries: 5
-      start_period: 3s
-      start_interval: 1s
+      start_period: 5s
+      start_interval: 5s
     ports:
       - "443:443"
     env_file: .env

@@ -5,6 +5,7 @@ FRONT_END_DIR="/home/acamargo/data/acamargo.42.fr/frontend/"
 CACHE_DIR="/home/acamargo/data/acamargo.42.fr/cache"
 PORTAFOLIO_DIR="/home/acamargo/data/cargoo"
 PORTAINER_DIR="/home/acamargo/data/portainer"
+SITE_DIR="/home/acamargo/data/acamargo.42.fr/"
 
 if [ ! -d $DB_DIR ]
 then
@@ -15,7 +16,7 @@ fi
 if [ ! -d $FRONT_END_DIR ]
 then
 	sudo mkdir -p $FRONT_END_DIR
-	sudo chown -R www-data:www-data $FRONT_END_DIR
+	sudo chown -R www-data:www-data $SITE_DIR
 	sudo chmod -R 775 $FRONT_END_DIR
 fi
 
