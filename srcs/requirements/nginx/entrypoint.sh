@@ -25,6 +25,4 @@ then
 	hugo 1>/dev/null
 fi
 
-chown -R www-data:www-data /var/www/
-
 exec nginx -g "daemon off;"

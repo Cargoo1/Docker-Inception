@@ -8,8 +8,7 @@ RUN 	apt update -y && \
 RUN	curl --silent https://wordpress.org/wordpress-7.1.tar.gz --output wordpress.tar.gz && \
 	tar -xf wordpress.tar.gz
 
-RUN	mkdir -p /var/www/$DOMAIN_NAME &&\
-	chown -R www-data:www-data /var/www/$DOMAIN_NAME
+RUN	mkdir -p /var/www/$DOMAIN_NAME
 
 COPY	wp-config.php /var/www/${DOMAIN_NAME}/
 
