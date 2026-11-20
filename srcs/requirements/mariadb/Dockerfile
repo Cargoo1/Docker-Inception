@@ -1,4 +1,4 @@
-FROM	debian:12
+FROM	debian:bookworm
 
 RUN	apt update -y && apt install -y \
 	mariadb-server \

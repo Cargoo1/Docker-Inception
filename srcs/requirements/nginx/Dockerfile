@@ -1,4 +1,4 @@
-FROM debian:12
+FROM debian:bookworm
 
 EXPOSE	443/tcp
 
