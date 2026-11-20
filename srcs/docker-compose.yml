@@ -1,0 +1,191 @@
+services:
+  mariadb:
+    build:
+      context:  ./requirements/mariadb/
+    image: mariadb:inception
+    container_name: mariadb
+    volumes:
+      - db:/var/lib/mysql/
+    networks:
+      - backend
+    env_file: .env
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "mariadb-check", "-p${ROOT_PASSWD}", "${DB_NAME}"]
+      interval: 2s
+      retries: 5
+      start_period: 10s
+      start_interval: 1s
+    environment:
+      ROOT_PASSWD: ${ROOT_PASSWD}
+      DB_NAME: ${DB_NAME}
+      DB_USR_NAME: ${DB_USR_NAME}
+      DB_USR_PASSWD: ${DB_USR_PASSWD}
+
+  wordpress:
+    build:
+      context: ./requirements/wordpress/  
+      args:
+        DOMAIN_NAME:  ${DOMAIN_NAME}
+    restart: on-failure
+    image: wordpress:inception
+    container_name: wordpress
+    env_file: .env
+    environment:
+        DOMAIN_NAME: ${DOMAIN_NAME}
+        LOGIN: ${LOGIN}
+        NGINX_CONF_PATH: ${NGINX_CONF_PATH}
+        SRV_ROOT: ${SRV_ROOT}
+        PM_STRATEGY: ${PM_STRATEGY}
+        PM_START_CHILDS: ${PM_START_CHILDS}
+        PM_MAX_CHILDS: ${PM_MAX_CHILDS}
+        PM_MIN_CHILDS: ${PM_MIN_CHILDS}
+        PM_TIMEOUT: ${PM_TIMEOUT}
+        DB_NAME: ${DB_NAME}
+        DB_USR_NAME: ${DB_USR_NAME}
+        DB_USR_PASSWD: ${DB_USR_PASSWD}
+        WP_ADMIN_NAME: ${WP_ADMIN_NAME}
+        WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+        WP_ADMIN_PASSWD: ${WP_ADMIN_PASSWD}
+        WP_USR_NAME: ${WP_USR_NAME}
+        WP_USR_EMAIL: ${WP_USR_EMAIL}
+        WP_USR_PASSWD: ${WP_USR_PASSWD}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_started
+        restart: true
+    healthcheck:
+      test: ["CMD-SHELL", "wp user exists 1 --allow-root --path=/var/www/${DOMAIN_NAME} && wp user exists 2 --allow-root --path=/var/www/${DOMAIN_NAME} "]
+      interval: 1s
+      retries: 2
+      start_period: 5s
+      start_interval: 0s
+    networks:
+      - backend
+      - redis-cache
+      - frontend
+    volumes:
+      - frontend:/var/www/${DOMAIN_NAME}
+  redis:
+    build:
+      context: ./requirements/redis/
+    image: redis:inception
+    restart: on-failure
+    container_name: redis
+    networks:
+      - redis-cache
+    volumes:
+      - cache:/var/lib/redis
+    env_file: .env
+    environment:
+      REDIS_PASSWD: ${REDIS_PASSWD}
+  vsftpd:
+    build:
+      context: ./requirements/vsftpd
+    image: vsftpd:inception
+    restart: on-failure
+    ports:
+      - "21:21"
+      - "20:20"
+      - "10000-10010:10000-10010"
+    container_name: vsftpd
+    volumes:
+      - frontend:/home/${FTP_USR}/
+    env_file: .env
+    environment:
+      FTP_USR: ${FTP_USR}
+      FTP_PASSWD: ${FTP_PASSWD}
+  portainer:
+    build:
+      context: ./requirements/portainer/
+    image: portainer:inception
+    container_name: portainer
+    restart: on-failure
+    ports:
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer:/data
+  nginx:
+    build:
+      context: ./requirements/nginx/
+      args:
+        NGINX_CONF_PATH: ${NGINX_CONF_PATH}
+        DOMAIN_NAME:  ${DOMAIN_NAME}
+    image: nginx:inception
+    restart: on-failure
+    container_name: nginx
+    ports:
+      - "443:443"
+    env_file: .env
+    secrets:
+      - source: server_certificate
+        target: server_certificate.crt
+      - source: server_key
+        target: server_key.key
+    depends_on:
+      wordpress:
+        condition: service_healthy
+        restart: true
+    networks:
+      - frontend
+    environment:
+        NGINX_CONF_PATH: ${NGINX_CONF_PATH}
+        DOMAIN_NAME: ${DOMAIN_NAME}
+        LOGIN:  ${LOGIN}
+    volumes:
+      - frontend:/var/www/${DOMAIN_NAME}
+      - portfolio:/var/www/cargoo
+
+
+networks:
+  frontend:
+    name: frontend_network
+    driver: bridge
+  backend:
+    name: backend_network
+    driver:  bridge
+  redis-cache:
+    name: redis-cache_network
+    driver: bridge
+
+volumes:
+  frontend:
+    name: frontend_volume
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/acamargo/data/acamargo.42.fr/frontend
+  db:
+    name: db_volume
+    driver_opts:
+      type: none
+      o:  bind
+      device: /home/acamargo/data/acamargo.42.fr/db
+  cache:
+    name: cache_volume
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/acamargo/data/acamargo.42.fr/cache
+  portfolio:
+    name: portfolio_volume
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/acamargo/data/cargoo/
+  portainer:
+    name: portainer_volume
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/acamargo/data/portainer/
+
+secrets:
+  server_certificate:
+    file: ../secrets/server_certificate.crt
+  server_key:
+    file: ../secrets/server_key.key
