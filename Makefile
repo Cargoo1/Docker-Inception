@@ -1,6 +1,7 @@
 FILE_PATH = ./srcs/docker-compose.yml
 COMPOSE_CLI = docker compose -f $(FILE_PATH)
 IMAGES = $(shell docker images -qa)
+SETUP_SCRIPT = ./setup.sh
 
 all: setup
 ifeq ($(IMAGES),)
@@ -9,8 +10,7 @@ endif
 	@make up
 
 setup:
-	@chmod +x ./setup.sh
-	@./setup.sh
+	@chmod +x $(SETUP_SCRIPT) && $(SETUP_SCRIPT)
 
 up:
 	$(COMPOSE_CLI) up -d

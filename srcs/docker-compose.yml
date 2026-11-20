@@ -95,9 +95,15 @@ services:
     volumes:
       - frontend:/home/${FTP_USR}/
     env_file: .env
+    depends_on:
+      nginx:
+        condition: service_healthy
+        restart: true
     environment:
       FTP_USR: ${FTP_USR}
       FTP_PASSWD: ${FTP_PASSWD}
+    networks:
+      - vsftpd
   portainer:
     build:
       context: ./requirements/portainer/
@@ -109,6 +115,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer:/data
+    networks:
+      - portainer
   nginx:
     build:
       context: ./requirements/nginx/
@@ -118,6 +126,12 @@ services:
     image: nginx:inception
     restart: on-failure
     container_name: nginx
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "-k" , "https://localhost/"]
+      interval: 2s
+      retries: 5
+      start_period: 3s
+      start_interval: 1s
     ports:
       - "443:443"
     env_file: .env
@@ -150,6 +164,12 @@ networks:
     driver:  bridge
   redis-cache:
     name: redis-cache_network
+    driver: bridge
+  vsftpd:
+    name: vsftpd_network
+    driver: bridge
+  portainer:
+    name: portainer_network
     driver: bridge
 
 volumes:
