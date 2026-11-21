@@ -12,10 +12,10 @@ services:
     restart: on-failure
     healthcheck:
       test: ["CMD", "mariadb-check", "-p${ROOT_PASSWD}", "${DB_NAME}"]
-      interval: 2s
+      interval: 5s
       retries: 5
-      start_period: 10s
-      start_interval: 1s
+      start_period: 0s
+      start_interval: 2s
     environment:
       ROOT_PASSWD: ${ROOT_PASSWD}
       DB_NAME: ${DB_NAME}
@@ -59,10 +59,10 @@ services:
         restart: true
     healthcheck:
       test: ["CMD-SHELL", "wp user exists 1 --allow-root --path=/var/www/${DOMAIN_NAME} && wp user exists 2 --allow-root --path=/var/www/${DOMAIN_NAME} "]
-      interval: 1s
-      retries: 2
-      start_period: 5s
-      start_interval: 0s
+      interval: 3s
+      retries: 3
+      start_period: 0s
+      start_interval: 1s
     networks:
       - backend
       - redis-cache
